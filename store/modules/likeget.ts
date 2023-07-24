@@ -38,7 +38,7 @@ interface Action {
 export default function likeget(state = initState, action: Action) {
   switch (action.type) {
     case LIKE:
-      return { ...state, like: [...action.payload] };
+      return { ...state, like: action.payload };
     case REQLIKE:
       return { ...state, req: !state.req };
     default:
