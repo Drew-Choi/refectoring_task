@@ -35,10 +35,10 @@ interface Action {
 }
 
 // 리듀서 일해라. export default ; 이 파일을 import 하면 기본으로 나가는.
-export default function scroll_Handle(state = initState, action: Action) {
+export default function likeget(state = initState, action: Action) {
   switch (action.type) {
     case LIKE:
-      return { ...state, like: action.payload };
+      return { ...state, like: [...action.payload] };
     case REQLIKE:
       return { ...state, req: !state.req };
     default:

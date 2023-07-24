@@ -6,21 +6,40 @@ import { AiTwotoneHeart } from 'react-icons/ai';
 import { color } from '@/theme/theme_other';
 import FadeIn from './FadeIn';
 import Link from 'next/link';
+import React from 'react';
+import { useSelector } from 'react-redux';
 
 // ssr 프롭스 데이터 타입 설정
 type SsrDataType = {
   article: IndexDataType;
   index: number;
   heartOnClick?: any;
-  likeCount: { like_count: number }[];
 };
 
 const ArticleThum: NextPage<SsrDataType> = ({
   article,
   index,
   heartOnClick,
-  likeCount,
 }) => {
+  console.log('ArticleThum 컴포넌트 재랜더링');
+
+  // 좋아요는 리덕스에서 정보 바로바로 업데이트
+  // 리덕스 state 타입
+  interface LikeRedux {
+    likeget: { like: { like_count: number }[] };
+  }
+  const likeCount = useSelector(
+    (state: LikeRedux) => state.likeget.like,
+    // state배열 내부 요소가 바뀌지 않는 이상 이전 값을 유지
+    (pre, next) => {
+      if (pre.length !== next.length) {
+        return false;
+      }
+
+      return pre.every((el, index) => el.like_count === next[index].like_count);
+    },
+  );
+
   return (
     <FadeIn index={index % 3 === 0 ? 0 : index % 3 === 2 ? 1 : 0.5}>
       <div
@@ -99,7 +118,7 @@ const ArticleThum: NextPage<SsrDataType> = ({
               margin-right: 20px;
             `}
           >
-            {likeCount[index].like_count}
+            {likeCount[index]?.like_count}
           </span>
           <AiTwotoneHeart
             onClick={heartOnClick}
@@ -121,4 +140,11 @@ const ArticleThum: NextPage<SsrDataType> = ({
   );
 };
 
-export default ArticleThum;
+export default React.memo(ArticleThum, (prevProps, nextProps) => {
+  // props의 얕은 비교를 커스텀하여 변경 여부 판단
+  return (
+    prevProps.article.title === nextProps.article.title &&
+    prevProps.index === nextProps.index &&
+    prevProps.heartOnClick === nextProps.heartOnClick
+  );
+});

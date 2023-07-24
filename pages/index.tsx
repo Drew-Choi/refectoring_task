@@ -8,10 +8,9 @@ import FadeIn from '@/components/FadeIn';
 import { Fade } from '@mui/material';
 import axios from 'axios';
 import { IndexDataType } from '@/function/types';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { reqLike } from '@/store/modules/likeget';
-import MediaQuery from 'react-responsive';
 
 // 서버사이드렌더
 export const getServerSideProps = async () => {
@@ -43,11 +42,6 @@ type SsrDataType = {
   ssrData: [IndexDataType];
 };
 
-// 리덕스 state 타입
-interface LikeRedux {
-  likeget: { like: [] };
-}
-
 const Home: NextPage<SsrDataType> = ({ ssrData }) => {
   // 리덕스 state 타입
   interface TestRedux {
@@ -57,8 +51,6 @@ const Home: NextPage<SsrDataType> = ({ ssrData }) => {
 
   // 재랜더링용 리덕스활용
   const dispatch = useDispatch();
-  // 좋아요는 리덕스에서 정보 바로바로 업데이트
-  const likeCount = useSelector((state: LikeRedux) => state.likeget.like);
 
   // 이전 skip위치 확인용
   const [skip, setSkip] = useState<number>(0);
@@ -72,50 +64,55 @@ const Home: NextPage<SsrDataType> = ({ ssrData }) => {
   // 처음에 SSR로 받아서 data전용 상태보관이 없어 생성
   const [data, setData] = useState<IndexDataType[]>([]);
 
-  // 무한스크롤, 스크롤 위치에 다라 요청이 가도록 설정
-  const getArticleInfinit = useCallback(async () => {
-    setScrollSpot((cur) => cur + 1350);
-    const nextPage = skip + Take;
-    try {
-      const response = await axios.get(
-        `/api/library/content?skip=${nextPage}&take=${Take}`,
-      );
+  // // 무한스크롤, 스크롤 위치에 다라 요청이 가도록 설정
+  // const getArticleInfinit = useCallback(async () => {
+  //   setScrollSpot((cur) => cur + 1350);
+  //   const nextPage = skip + Take;
+  //   try {
+  //     const response = await axios.get(
+  //       `/api/library/content?skip=${nextPage}&take=${Take}`,
+  //     );
 
-      if (response.status === 200 && response.data.items.length !== 0) {
-        setData((cur) => {
-          let copy = [...cur, ...response.data.items];
-          return copy;
-        });
-        setSkip(nextPage);
-      }
-    } catch (err) {
-      console.error('API요청 오류: ', err);
-    }
-  }, [skip]);
+  //     if (response.status === 200 && response.data.items.length !== 0) {
+  //       setData((cur) => {
+  //         let copy = [...cur, ...response.data.items];
+  //         return copy;
+  //       });
+  //       setSkip(nextPage);
+  //     }
+  //   } catch (err) {
+  //     console.error('API요청 오류: ', err);
+  //   }
+  // }, [skip]);
 
-  useEffect(() => {
-    if (scrollValue >= scrollSpot) {
-      getArticleInfinit();
-    }
-  }, [scrollValue]);
+  // useEffect(() => {
+  //   if (scrollValue >= scrollSpot) {
+  //     getArticleInfinit();
+  //   }
+  // }, [scrollValue]);
 
   // 좋아요 업데이트
-  const likeUpdate = async (id: number) => {
-    try {
-      const response = await axios.post(`/api/library/content/${id}/like`, {
-        like_count: 1,
-      });
+  // props시에 계속 리랜더링 되는 것을 방지하기 위해 useCallback
+  const likeUpdate = useCallback(
+    async (id: number) => {
+      try {
+        const response = await axios.post(`/api/library/content/${id}/like`, {
+          like_count: 1,
+        });
+        console.log('하트 온클릭 재생성됨');
 
-      if (response.status === 200) {
-        console.log(response.data.message);
-        dispatch(reqLike());
-      } else {
-        alert(response.data.message);
+        if (response.status === 200) {
+          console.log(response.data.message);
+          dispatch(reqLike());
+        } else {
+          alert(response.data.message);
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    },
+    [dispatch],
+  );
 
   // 화면 가로폭 구하기
   const [windowWidth, setWindowWidth] = useState(0);
@@ -131,6 +128,8 @@ const Home: NextPage<SsrDataType> = ({ ssrData }) => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  console.log('index컴포넌트 재랜더링');
 
   return (
     // 메인 컨테이너
@@ -311,7 +310,6 @@ const Home: NextPage<SsrDataType> = ({ ssrData }) => {
             scrollValue > 571 &&
             ssrData.map((article, index) => (
               <ArticleThum
-                likeCount={likeCount}
                 index={index}
                 key={article.id}
                 article={article}
@@ -320,7 +318,7 @@ const Home: NextPage<SsrDataType> = ({ ssrData }) => {
             ))}
         </div>
 
-        <div
+        {/* <div
           className={`grid ${
             windowWidth < 600 && windowWidth >= 500
               ? 'grid-cols-2'
@@ -339,7 +337,7 @@ const Home: NextPage<SsrDataType> = ({ ssrData }) => {
                 heartOnClick={() => likeUpdate(article.id)}
               />
             ))}
-        </div>
+        </div> */}
       </section>
     </main>
   );
