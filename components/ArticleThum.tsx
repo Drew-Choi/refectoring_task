@@ -6,7 +6,7 @@ import { AiTwotoneHeart } from 'react-icons/ai';
 import { color } from '@/theme/theme_other';
 import FadeIn from './FadeIn';
 import Link from 'next/link';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
 // ssr 프롭스 데이터 타입 설정
@@ -39,6 +39,11 @@ const ArticleThum: NextPage<SsrDataType> = ({
       return pre.every((el, index) => el.like_count === next[index].like_count);
     },
   );
+
+  // ---- 프롭스도 콜백
+  const heartOnClickCallback = useCallback(() => {
+    heartOnClick();
+  }, [likeCount]);
 
   return (
     <FadeIn index={index % 3 === 0 ? 0 : index % 3 === 2 ? 1 : 0.5}>
@@ -121,7 +126,7 @@ const ArticleThum: NextPage<SsrDataType> = ({
             {likeCount[index]?.like_count}
           </span>
           <AiTwotoneHeart
-            onClick={heartOnClick}
+            onClick={heartOnClickCallback}
             css={css`
               font-size: 40px;
               color: ${color.primary};
@@ -140,11 +145,4 @@ const ArticleThum: NextPage<SsrDataType> = ({
   );
 };
 
-export default React.memo(ArticleThum, (prevProps, nextProps) => {
-  // props의 얕은 비교를 커스텀하여 변경 여부 판단
-  return (
-    prevProps.article.title === nextProps.article.title &&
-    prevProps.index === nextProps.index &&
-    prevProps.heartOnClick === nextProps.heartOnClick
-  );
-});
+export default React.memo(ArticleThum);

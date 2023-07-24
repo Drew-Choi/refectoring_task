@@ -1,5 +1,5 @@
 import { Fade } from '@mui/material';
-import { ReactElement, ReactNode } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 
 const FadeIn = ({
   children,
@@ -21,4 +21,7 @@ const FadeIn = ({
   );
 };
 
-export default FadeIn;
+export default React.memo(
+  FadeIn,
+  (pre, next) => pre.index === next.index && pre.children === next.children,
+);
