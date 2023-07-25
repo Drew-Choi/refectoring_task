@@ -49,6 +49,8 @@ const Write: NextPage = () => {
     }
   };
 
+  console.log('라이트');
+
   return (
     <main
       css={css`

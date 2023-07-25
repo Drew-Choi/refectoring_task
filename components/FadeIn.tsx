@@ -21,7 +21,4 @@ const FadeIn = ({
   );
 };
 
-export default React.memo(
-  FadeIn,
-  (pre, next) => pre.index === next.index && pre.children === next.children,
-);
+export default FadeIn;

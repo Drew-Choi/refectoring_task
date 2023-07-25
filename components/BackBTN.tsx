@@ -1,5 +1,6 @@
 import { color } from '@/theme/theme_other';
 import { css } from '@emotion/react';
+import React from 'react';
 import { BsFillBackspaceFill } from 'react-icons/bs';
 
 const BackBTN = ({ className }: { className?: any }) => {
@@ -23,4 +24,4 @@ const BackBTN = ({ className }: { className?: any }) => {
   );
 };
 
-export default BackBTN;
+export default React.memo(BackBTN);

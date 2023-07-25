@@ -10,6 +10,8 @@ interface BtnProps {
 }
 
 const ButtonCustom: NextPage<BtnProps> = ({ children, onClick, className }) => {
+  console.log('버튼');
+
   return (
     <button
       css={css`
