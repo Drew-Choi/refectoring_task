@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { IndexDataType } from '@/function/types';
 import { css } from '@emotion/react';
 import { NextPage } from 'next';

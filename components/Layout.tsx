@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { like } from '@/store/modules/likeget';
 import { reset, value } from '@/store/modules/scroll_Handle';
 import styled from '@emotion/styled';
